@@ -1,0 +1,32 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Directorate>
+ */
+class DirectorateFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->randomElement([
+                'Main Directorate',
+                'Commercial',
+                'Technology',
+                'Finance & Business Partner',
+                'Global Offices',
+                'Corporate Secretary',
+            ]),
+            'create_dtm' => fake()->dateTime(),
+            'update_dtm' => fake()->dateTime(),
+        ];
+    }
+}

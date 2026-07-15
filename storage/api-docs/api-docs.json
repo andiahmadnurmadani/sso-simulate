@@ -1,0 +1,891 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Employee API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Display a listing of the resource.",
+                "description": "Mengambil daftar employee",
+                "operationId": "employeesIndex",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Jumlah item per halaman",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Filter berdasarkan name, nik_telin, email, atau status_login",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daftar employee",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Employee"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Store a newly created resource in storage.",
+                "description": "Membuat employee baru",
+                "operationId": "employeesStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmployeeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Employee berhasil dibuat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/employees/{emp_id}": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Display the specified resource.",
+                "description": "Mengambil detail employee",
+                "operationId": "employeesShow",
+                "parameters": [
+                    {
+                        "name": "emp_id",
+                        "in": "path",
+                        "description": "ID employee",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail employee",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee tidak ditemukan"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Update the specified resource in storage.",
+                "description": "Memperbarui data employee",
+                "operationId": "employeesUpdate",
+                "parameters": [
+                    {
+                        "name": "emp_id",
+                        "in": "path",
+                        "description": "ID employee",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmployeeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Employee berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Remove the specified resource from storage.",
+                "description": "Menghapus employee",
+                "operationId": "employeesDestroy",
+                "parameters": [
+                    {
+                        "name": "emp_id",
+                        "in": "path",
+                        "description": "ID employee",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Employee berhasil dihapus"
+                    },
+                    "404": {
+                        "description": "Employee tidak ditemukan"
+                    }
+                }
+            }
+        },
+        "/oauth-clients": {
+            "get": {
+                "tags": [
+                    "OAuth Clients"
+                ],
+                "summary": "Display a listing of OAuth clients.",
+                "description": "Daftar aplikasi client yang terdaftar",
+                "operationId": "oauthClientsIndex",
+                "responses": {
+                    "200": {
+                        "description": "Daftar client"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "OAuth Clients"
+                ],
+                "summary": "Store a newly created OAuth client.",
+                "description": "Mendaftarkan aplikasi client baru",
+                "operationId": "oauthClientsStore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "client_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "client_secret": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "allowed_redirect_uris": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client berhasil dibuat"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/oauth-clients/{id}": {
+            "get": {
+                "tags": [
+                    "OAuth Clients"
+                ],
+                "summary": "Display the specified OAuth client.",
+                "description": "Detail aplikasi client",
+                "operationId": "oauthClientsShow",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detail client"
+                    },
+                    "404": {
+                        "description": "Client tidak ditemukan"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "OAuth Clients"
+                ],
+                "summary": "Update the specified OAuth client.",
+                "description": "Memperbarui aplikasi client",
+                "operationId": "oauthClientsUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "client_secret": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "allowed_redirect_uris": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client berhasil diperbarui"
+                    },
+                    "404": {
+                        "description": "Client tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "OAuth Clients"
+                ],
+                "summary": "Remove the specified OAuth client.",
+                "description": "Menghapus aplikasi client",
+                "operationId": "oauthClientsDestroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Client berhasil dihapus"
+                    },
+                    "404": {
+                        "description": "Client tidak ditemukan"
+                    }
+                }
+            }
+        },
+        "/sso/token": {
+            "post": {
+                "tags": [
+                    "SSO"
+                ],
+                "summary": "Issue access token untuk aplikasi client.",
+                "description": "Login employee dan dapatkan JWT access token untuk SSO",
+                "operationId": "ssoToken",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "client_id",
+                                    "client_secret",
+                                    "email",
+                                    "password",
+                                    "grant_type"
+                                ],
+                                "properties": {
+                                    "client_id": {
+                                        "type": "string"
+                                    },
+                                    "client_secret": {
+                                        "type": "string"
+                                    },
+                                    "grant_type": {
+                                        "type": "string",
+                                        "example": "password"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token berhasil diterbitkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                }
+            }
+        },
+        "/sso/userinfo": {
+            "get": {
+                "tags": [
+                    "SSO"
+                ],
+                "summary": "Ambil data user yang sedang login.",
+                "description": "Ambil data employee beserta jabatan dan foto profile berdasarkan Bearer token",
+                "operationId": "ssoUserinfo",
+                "responses": {
+                    "200": {
+                        "description": "Data user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/sso/introspect": {
+            "post": {
+                "tags": [
+                    "SSO"
+                ],
+                "summary": "Introspect token.",
+                "description": "Validasi access token dan kembalikan klaimnya",
+                "operationId": "ssoIntrospect",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token aktif",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "active": {
+                                            "type": "boolean"
+                                        },
+                                        "sub": {
+                                            "type": "integer"
+                                        },
+                                        "exp": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Employee": {
+                "description": "Model Employee",
+                "properties": {
+                    "emp_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "nik_telin": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "nik_tg": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "gender": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "religion": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "place_of_birth": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "employee_status": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "position_band": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "work_location": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "office_address": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "province": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pos_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "telepon": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_address": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_province": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_country": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_pos_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "my_tlp_no": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "email_asli": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "profile_photo": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "language": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "user_status_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "auth_type_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "auth_dtm": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "nonce": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "token": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "attempts": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status_login": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "positions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Position"
+                        },
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeRequest": {
+                "description": "Payload untuk membuat/memperbarui Employee",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "nik_telin": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "nik_tg": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "gender": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "religion": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "place_of_birth": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "employee_status": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "position_band": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "work_location": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "office_address": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 200
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "province": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "pos_code": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "telepon": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "my_address": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 200
+                    },
+                    "my_city": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "my_province": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "my_country": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "my_pos_code": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "my_tlp_no": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "email": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "email_asli": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "profile_photo": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "password": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 120
+                    },
+                    "language": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    },
+                    "user_status_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "auth_type_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "auth_dtm": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "nonce": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 32
+                    },
+                    "token": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 32
+                    },
+                    "attempts": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status_login": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 45
+                    }
+                },
+                "type": "object"
+            },
+            "Position": {
+                "description": "Model Position",
+                "properties": {
+                    "pos_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "department": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "pivot": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "OAuth Clients",
+            "description": "Manajemen aplikasi client SSO"
+        },
+        {
+            "name": "SSO",
+            "description": "Identity Provider endpoints seperti WSO2"
+        },
+        {
+            "name": "Employees",
+            "description": "Employees"
+        }
+    ]
+}
