@@ -33,7 +33,7 @@
                     <span class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:block">Use this base URL for every SSO API request from your application.</span>
                 </span>
             </div>
-            <code class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">{{ $baseUrl }}</code>
+            <pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono"><code>{{ $baseUrl }}</code></pre>
         </div>
 
         <!-- Steps -->
@@ -68,19 +68,19 @@
                 <code class="text-sm font-semibold text-slate-700">{{ $baseUrl }}/api/sso/token</code>
             </div>
             <div class="mt-4 space-y-4">
-                <div class="rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">{
-  "client_id": "your-generated-client-id",
-  "client_secret": "your-generated-client-secret",
-  "grant_type": "password",
-  "email": "user@telin.com",
-  "password": "password"
-}</div>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono"><code>{
+    "client_id": "your-generated-client-id",
+    "client_secret": "your-generated-client-secret",
+    "grant_type": "password",
+    "email": "user@telin.com",
+    "password": "password"
+}</code></pre>
                 <p class="text-sm text-slate-500">Response:</p>
-                <div class="rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">{
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "token_type": "Bearer",
-  "expires_in": 3600
-}</div>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono"><code>{
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "token_type": "Bearer",
+    "expires_in": 3600
+}</code></pre>
             </div>
         </div>
 
@@ -97,7 +97,8 @@
                     <span class="rounded-lg bg-indigo-600 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">GET</span>
                     <code class="text-sm font-semibold text-slate-700">{{ $baseUrl }}/api/sso/userinfo</code>
                 </div>
-                <div class="mt-4 rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">Authorization: Bearer &lt;access_token&gt;</div>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-4"><code>GET {{ $baseUrl }}/api/sso/userinfo
+Authorization: Bearer &lt;access_token&gt;</code></pre>
             </div>
 
             <!-- Introspect -->
@@ -112,36 +113,36 @@
                     <span class="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">POST</span>
                     <code class="text-sm font-semibold text-slate-700">{{ $baseUrl }}/api/sso/introspect</code>
                 </div>
-                <div class="mt-4 rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">{
-  "token": "eyJ0eXAiOiJKV1Qi..."
-}</div>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-4"><code>{
+    "token": "eyJ0eXAiOiJKV1Qi..."
+}</code></pre>
             </div>
         </div>
 
-        <!-- Code example -->
+        <!-- JS Example -->
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
             <h2 class="text-lg font-bold text-slate-900">JavaScript Example</h2>
-            <div class="mt-4 overflow-x-auto rounded-xl bg-slate-900 p-4 text-sm text-emerald-400">async function loginWithTelinSSO(email, password) {
-  const tokenRes = await fetch('{{ $baseUrl }}/api/sso/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id: 'your-client-id',
-      client_secret: 'your-client-secret',
-      grant_type: 'password',
-      email,
-      password
-    })
-  });
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-4"><code>async function loginWithTelinSSO(email, password) {
+    const tokenRes = await fetch('{{ $baseUrl }}/api/sso/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            client_id: 'your-client-id',
+            client_secret: 'your-client-secret',
+            grant_type: 'password',
+            email,
+            password
+        })
+    });
 
-  const { access_token } = await tokenRes.json();
+    const { access_token } = await tokenRes.json();
 
-  const userRes = await fetch('{{ $baseUrl }}/api/sso/userinfo', {
-    headers: { 'Authorization': `Bearer ${access_token}` }
-  });
+    const userRes = await fetch('{{ $baseUrl }}/api/sso/userinfo', {
+        headers: { 'Authorization': `Bearer ${access_token}` }
+    });
 
-  return await userRes.json();
-}</div>
+    return await userRes.json();
+}</code></pre>
         </div>
 
         <!-- Registered Apps -->
