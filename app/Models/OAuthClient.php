@@ -28,4 +28,18 @@ class OAuthClient extends Model
             'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * Check if the given redirect URI is registered for this client.
+     */
+    public function validatesRedirectUri(string $redirectUri): bool
+    {
+        if (empty($this->allowed_redirect_uris)) {
+            return false;
+        }
+
+        $allowed = array_map('trim', explode(',', $this->allowed_redirect_uris));
+
+        return in_array($redirectUri, $allowed, true);
+    }
 }

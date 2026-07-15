@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DataExplorerController;
 use App\Http\Controllers\DeveloperDocsController;
+use App\Http\Controllers\SsoAuthorizeController;
 use App\Http\Controllers\SsoViewController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,11 @@ Route::prefix('sso')->name('sso.')->group(function () {
     Route::get('/', [SsoViewController::class, 'index'])->name('index');
     Route::post('/login', [SsoViewController::class, 'login'])->name('login');
     Route::get('/token', [SsoViewController::class, 'index']);
+
+    // Authorization Code Flow
+    Route::get('/authorize', [SsoAuthorizeController::class, 'show'])->name('authorize');
+    Route::post('/authorize', [SsoAuthorizeController::class, 'approve'])->name('authorize.approve');
+
     Route::get('/clients', [SsoViewController::class, 'clients'])->name('clients');
     Route::get('/clients/create', [SsoViewController::class, 'createClient'])->name('createClient');
     Route::post('/clients', [SsoViewController::class, 'storeClient'])->name('storeClient');

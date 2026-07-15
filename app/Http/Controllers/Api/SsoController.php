@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
+use App\Models\OAuthAuthorizationCode;
 use App\Models\OAuthClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use OpenApi\Attributes as OA;
 class SsoController extends Controller
 {
     private const TOKEN_TTL = 3600;
+    private const CODE_TTL = 600;
 
     /**
      * Issue access token untuk aplikasi client.
@@ -26,13 +28,15 @@ class SsoController extends Controller
         description: 'Login employee dan dapatkan JWT access token untuk SSO',
         tags: ['SSO'],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
-            required: ['client_id', 'client_secret', 'email', 'password', 'grant_type'],
+            required: ['client_id', 'client_secret', 'grant_type'],
             properties: [
                 new OA\Property(property: 'client_id', type: 'string'),
                 new OA\Property(property: 'client_secret', type: 'string'),
                 new OA\Property(property: 'grant_type', type: 'string', example: 'password'),
                 new OA\Property(property: 'email', type: 'string'),
                 new OA\Property(property: 'password', type: 'string'),
+                new OA\Property(property: 'code', type: 'string'),
+                new OA\Property(property: 'redirect_uri', type: 'string'),
             ]
         )),
         responses: [
@@ -52,9 +56,7 @@ class SsoController extends Controller
         $request->validate([
             'client_id' => ['required', 'string'],
             'client_secret' => ['required', 'string'],
-            'grant_type' => ['required', 'string', 'in:password'],
-            'email' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'grant_type' => ['required', 'string', 'in:password,authorization_code'],
         ]);
 
         $client = OAuthClient::where('client_id', $request->input('client_id'))
@@ -66,10 +68,13 @@ class SsoController extends Controller
             return response()->json(['error' => 'invalid_client'], 401);
         }
 
-        $employee = Employee::where('email', $request->input('email'))->first();
+        $employee = match ($request->input('grant_type')) {
+            'password' => $this->resolvePasswordGrant($request, $client),
+            'authorization_code' => $this->resolveAuthorizationCodeGrant($request, $client),
+        };
 
-        if (! $employee || ! Hash::check($request->input('password'), $employee->password)) {
-            return response()->json(['error' => 'invalid_credentials'], 401);
+        if (! $employee) {
+            return response()->json(['error' => 'invalid_grant'], 400);
         }
 
         $token = $this->generateToken($employee, $client);
@@ -79,6 +84,44 @@ class SsoController extends Controller
             'token_type' => 'Bearer',
             'expires_in' => self::TOKEN_TTL,
         ]);
+    }
+
+    private function resolvePasswordGrant(Request $request, OAuthClient $client): ?Employee
+    {
+        $request->validate([
+            'email' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
+
+        $employee = Employee::where('email', $request->input('email'))->first();
+
+        if (! $employee || ! Hash::check($request->input('password'), $employee->password)) {
+            return null;
+        }
+
+        return $employee;
+    }
+
+    private function resolveAuthorizationCodeGrant(Request $request, OAuthClient $client): ?Employee
+    {
+        $request->validate([
+            'code' => ['required', 'string'],
+            'redirect_uri' => ['required', 'string'],
+        ]);
+
+        $code = OAuthAuthorizationCode::where('code', $request->input('code'))
+            ->where('client_id', $client->client_id)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $code || $code->redirect_uri !== $request->input('redirect_uri')) {
+            return null;
+        }
+
+        $code->update(['used' => true]);
+
+        return Employee::find($code->employee_id);
     }
 
     /**

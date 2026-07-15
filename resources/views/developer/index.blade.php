@@ -25,6 +25,65 @@
             </div>
         </div>
 
+        <!-- Copy Prompt for AI -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Copy Prompt for AI</h2>
+                    <p class="text-sm text-slate-500">Copy this prompt and paste it to your AI assistant so it understands this SSO context.</p>
+                </div>
+                <button type="button" onclick="copyAiPrompt(this)" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-700">Copy Prompt</button>
+            </div>
+            <textarea id="ai-prompt" readonly class="hidden">I am integrating with an SSO Identity Provider built with Laravel. Here is the context:
+
+Project: Telin KM SSO
+Base URL: {{ $baseUrl }}
+Flows supported:
+1. Authorization Code Flow (recommended for web apps) — redirect_uri is validated.
+2. Resource Owner Password Credentials Grant (for testing/internal apps).
+
+Endpoints:
+- GET {{ $baseUrl }}/sso/authorize?client_id=...&redirect_uri=...&response_type=code&state=...
+  Browser flow. User logs in on SSO page, then is redirected back to redirect_uri with ?code=...&state=...
+
+- POST {{ $baseUrl }}/api/sso/token
+  For password grant:
+    Request body: { client_id, client_secret, grant_type: "password", email, password }
+  For authorization_code grant:
+    Request body: { client_id, client_secret, grant_type: "authorization_code", code, redirect_uri }
+  Response: { access_token, token_type: "Bearer", expires_in: 3600 }
+
+- GET {{ $baseUrl }}/api/sso/userinfo
+  Header: Authorization: Bearer <access_token>
+  Returns: employee profile, positions, departments, and profile_photo URL.
+
+- POST {{ $baseUrl }}/api/sso/introspect
+  Request body: { token }
+  Returns: { active: true/false, sub, exp }
+
+How to get client credentials:
+1. Open {{ route('sso.createClient') }}
+2. Fill Application Name and Redirect URIs.
+3. Click "Generate Credentials".
+4. Copy the generated Client ID and Client Secret on the next page.
+
+How to test login (Authorization Code Flow):
+1. Register a client with redirect_uri, e.g. https://httpbin.org/get
+2. Open browser: {{ $baseUrl }}/sso/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=https://httpbin.org/get&response_type=code&state=test
+3. Login with seeded employee email and password "password".
+4. Browser redirects to https://httpbin.org/get?code=AUTH_CODE&state=test
+5. POST {{ $baseUrl }}/api/sso/token with grant_type=authorization_code, code, redirect_uri, client_id, client_secret.
+6. Use access_token for /api/sso/userinfo.
+
+Important notes:
+- This is a simulation environment.
+- Redirect URIs are validated for Authorization Code Flow. Multiple URIs can be registered separated by commas.
+- Authorization code expires in 10 minutes and can only be used once.
+- Token is a JWT-like token signed with the client_secret using HS256.
+
+Please help me write/test/debug the SSO integration code for my application.</textarea>
+        </div>
+
         <!-- Base URL -->
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
             <div class="mb-4 flex items-center gap-2">
@@ -119,9 +178,42 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
             </div>
         </div>
 
+        <!-- Authorization Code Flow -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <div class="mb-4 flex items-center gap-2">
+                <h2 class="text-lg font-bold text-slate-900">Authorization Code Flow</h2>
+                <span class="group relative flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-slate-300 text-[10px] font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600">?
+                    <span class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-60 -translate-x-1/2 rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium text-white shadow-xl group-hover:block">Recommended for web apps. Redirect URI is validated against registered values.</span>
+                </span>
+            </div>
+
+            <p class="text-sm text-slate-500">Step 1 — Redirect user to SSO login page:</p>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-2"><code>{{ $baseUrl }}/sso/authorize?client_id=your-client-id&redirect_uri=https://your-app.com/callback&response_type=code&state=xyz</code></pre>
+
+            <p class="mt-4 text-sm text-slate-500">Step 2 — User logs in. SSO redirects back to your app with a code:</p>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-2"><code>https://your-app.com/callback?code=authorization-code&state=xyz</code></pre>
+
+            <p class="mt-4 text-sm text-slate-500">Step 3 — Exchange the code for an access token:</p>
+            <div class="mt-2 flex items-center gap-3">
+                <span class="rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">POST</span>
+                <code class="text-sm font-semibold text-slate-700">{{ $baseUrl }}/api/sso/token</code>
+            </div>
+<pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-2"><code>{
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "grant_type": "authorization_code",
+    "code": "authorization-code-from-callback",
+    "redirect_uri": "https://your-app.com/callback"
+}</code></pre>
+
+            <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                The <code class="rounded bg-white px-1 py-0.5 font-mono font-bold">redirect_uri</code> must exactly match one of the registered Redirect URIs for this client.
+            </div>
+        </div>
+
         <!-- JS Example -->
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
-            <h2 class="text-lg font-bold text-slate-900">JavaScript Example</h2>
+            <h2 class="text-lg font-bold text-slate-900">JavaScript Example (Password Grant)</h2>
 <pre class="block rounded-xl bg-slate-900 p-4 text-sm text-emerald-400 overflow-x-auto whitespace-pre font-mono mt-4"><code>async function loginWithTelinSSO(email, password) {
     const tokenRes = await fetch('{{ $baseUrl }}/api/sso/token', {
         method: 'POST',
@@ -192,4 +284,17 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
             </div>
         </div>
     </div>
+
+    <script>
+        function copyAiPrompt(btn) {
+            const prompt = document.getElementById('ai-prompt');
+            prompt.select();
+            prompt.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(prompt.value).then(() => {
+                const original = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = original, 1500);
+            });
+        }
+    </script>
 @endsection
