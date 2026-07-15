@@ -9,13 +9,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-100 text-slate-900 antialiased">
-    <div class="flex min-h-screen flex-col items-center px-4 pt-20 pb-12">
-        <div class="mb-12 text-center">
+    <div class="flex min-h-screen flex-col items-center px-4 pt-14 pb-12">
+        <div class="mb-8 text-center">
             <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Telin KM SSO</h1>
             <p class="mt-1 text-sm font-medium text-slate-500">Single Sign-On Identity Provider</p>
         </div>
         @yield('content')
-        <p class="mt-8 text-center text-xs text-slate-400">
+        <p class="mt-6 text-center text-xs text-slate-400">
             &copy; {{ date('Y') }} Telin KM &mdash; Simulation Environment
         </p>
     </div>
