@@ -68,6 +68,10 @@ class SsoController extends Controller
             return response()->json(['error' => 'invalid_client'], 401);
         }
 
+        if (! $client->supportsGrantType($request->input('grant_type'))) {
+            return response()->json(['error' => 'unauthorized_grant_type'], 400);
+        }
+
         $employee = match ($request->input('grant_type')) {
             'password' => $this->resolvePasswordGrant($request, $client),
             'authorization_code' => $this->resolveAuthorizationCodeGrant($request, $client),

@@ -20,7 +20,7 @@
         @endif
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <form method="POST" action="{{ $client ? route('sso.updateClient', $client) : route('sso.storeClient') }}" class="space-y-6">
+            <form method="POST" action="{{ $client ? route('sso.updateClient', $client) : route('sso.storeClient') }}" class="space-y-6" onsubmit="const btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='{{ $client ? 'Saving...' : 'Generating...' }}';">
                 @csrf
                 @if ($client)
                     @method('PUT')
@@ -62,11 +62,34 @@
                     <label for="allowed_redirect_uris" class="mb-1 block text-sm font-bold text-slate-700">
                         Redirect URIs
                         <span class="group relative ml-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-slate-300 text-[9px] font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600">?
-                            <span class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-slate-800 px-3 py-2 text-left text-xs font-medium text-white shadow-xl group-hover:block">Callback URL of your app after login. Separate multiple URLs with commas.</span>
+                            <span class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-slate-800 px-3 py-2 text-left text-xs font-medium text-white shadow-xl group-hover:block">Callback URL of your app after login. Separate multiple URLs with commas. Required for Authorization Code Flow.</span>
                         </span>
                     </label>
                     <input type="text" id="allowed_redirect_uris" name="allowed_redirect_uris" value="{{ old('allowed_redirect_uris', $client?->allowed_redirect_uris) }}" placeholder="https://your-app.com/callback" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10">
                     @error('allowed_redirect_uris')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">
+                        Allowed Grant Types
+                        <span class="group relative ml-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-slate-300 text-[9px] font-bold text-slate-400 hover:border-indigo-300 hover:text-indigo-600">?
+                            <span class="absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-slate-800 px-3 py-2 text-left text-xs font-medium text-white shadow-xl group-hover:block">Choose which OAuth2 flows this client may use.</span>
+                        </span>
+                    </label>
+                    <div class="flex flex-wrap gap-4 rounded-xl border border-slate-300 bg-white p-4">
+                        @php
+                            $selectedGrantTypes = old('grant_types', $client ? explode(',', $client->grant_types) : ['authorization_code']);
+                        @endphp
+                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                            <input type="checkbox" name="grant_types[]" value="authorization_code" {{ in_array('authorization_code', $selectedGrantTypes) ? 'checked' : '' }} class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            Authorization Code Flow
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                            <input type="checkbox" name="grant_types[]" value="password" {{ in_array('password', $selectedGrantTypes) ? 'checked' : '' }} class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            Password Grant
+                        </label>
+                    </div>
+                    @error('grant_types')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="flex items-center gap-3">

@@ -60,6 +60,8 @@ class SsoViewController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'allowed_redirect_uris' => ['nullable', 'string'],
+            'grant_types' => ['required', 'array', 'min:1'],
+            'grant_types.*' => ['in:password,authorization_code'],
             'is_active' => ['sometimes', 'nullable', 'boolean'],
         ]);
 
@@ -68,6 +70,7 @@ class SsoViewController extends Controller
             'client_id' => $this->generateClientId(),
             'client_secret' => hash('sha256', Str::random(32)),
             'allowed_redirect_uris' => $validated['allowed_redirect_uris'] ?? null,
+            'grant_types' => implode(',', $validated['grant_types']),
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
@@ -94,12 +97,15 @@ class SsoViewController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'allowed_redirect_uris' => ['nullable', 'string'],
+            'grant_types' => ['required', 'array', 'min:1'],
+            'grant_types.*' => ['in:password,authorization_code'],
             'is_active' => ['sometimes', 'nullable', 'boolean'],
         ]);
 
         $client->update([
             'name' => $validated['name'],
             'allowed_redirect_uris' => $validated['allowed_redirect_uris'] ?? null,
+            'grant_types' => implode(',', $validated['grant_types']),
             'is_active' => $validated['is_active'] ?? false,
         ]);
 

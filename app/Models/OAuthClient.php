@@ -19,6 +19,7 @@ class OAuthClient extends Model
         'client_secret',
         'name',
         'allowed_redirect_uris',
+        'grant_types',
         'is_active',
     ];
 
@@ -41,5 +42,25 @@ class OAuthClient extends Model
         $allowed = array_map('trim', explode(',', $this->allowed_redirect_uris));
 
         return in_array($redirectUri, $allowed, true);
+    }
+
+    /**
+     * Get allowed grant types as array.
+     */
+    public function allowedGrantTypes(): array
+    {
+        if (empty($this->grant_types)) {
+            return ['authorization_code'];
+        }
+
+        return array_map('trim', explode(',', $this->grant_types));
+    }
+
+    /**
+     * Check if the client supports a grant type.
+     */
+    public function supportsGrantType(string $grantType): bool
+    {
+        return in_array($grantType, $this->allowedGrantTypes(), true);
     }
 }

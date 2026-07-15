@@ -30,6 +30,7 @@
                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Client ID</th>
                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Client Secret</th>
                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Redirect URIs</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Grant Types</th>
                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Actions</th>
                         </tr>
@@ -46,6 +47,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-600">{{ $client->allowed_redirect_uris ?? '-' }}</td>
+                                <td class="px-6 py-4 text-sm text-slate-600">{{ $client->grant_types ?? 'authorization_code' }}</td>
                                 <td class="px-6 py-4 text-sm">
                                     @if ($client->is_active)
                                         <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active</span>
@@ -66,7 +68,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-500">
+                                <td colspan="7" class="px-6 py-12 text-center text-sm text-slate-500">
                                     No OAuth clients yet. <a href="{{ route('sso.createClient') }}" class="font-semibold text-indigo-600 hover:underline">Create one</a>.
                                 </td>
                             </tr>
