@@ -143,7 +143,7 @@ class SsoController extends Controller
     )]
     public function userinfo(Request $request): EmployeeResource
     {
-        return new EmployeeResource($request->attributes->get('sso_employee')->load('positions'));
+        return new EmployeeResource($request->attributes->get('sso_employee')->load('positions.department.directorate'));
     }
 
     /**

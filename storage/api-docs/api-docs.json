@@ -391,8 +391,6 @@
                                 "required": [
                                     "client_id",
                                     "client_secret",
-                                    "email",
-                                    "password",
                                     "grant_type"
                                 ],
                                 "properties": {
@@ -410,6 +408,12 @@
                                         "type": "string"
                                     },
                                     "password": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "redirect_uri": {
                                         "type": "string"
                                     }
                                 },
