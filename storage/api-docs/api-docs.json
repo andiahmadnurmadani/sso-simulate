@@ -375,6 +375,68 @@
                 }
             }
         },
+        "/sso/change-password": {
+            "post": {
+                "tags": [
+                    "SSO"
+                ],
+                "summary": "Ganti password employee (harus login dengan access token).\nVerifikasi password lama untuk keamanan.",
+                "description": "Ganti password employee yang sedang login. Membutuhkan access token (Bearer) dan password lama.",
+                "operationId": "ssoChangePassword",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "old_password",
+                                    "new_password"
+                                ],
+                                "properties": {
+                                    "old_password": {
+                                        "description": "Password lama",
+                                        "type": "string"
+                                    },
+                                    "new_password": {
+                                        "description": "Password baru (min 8 karakter)",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password berhasil diganti",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token tidak valid / password lama salah"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/sso/token": {
             "post": {
                 "tags": [
