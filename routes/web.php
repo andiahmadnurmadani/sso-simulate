@@ -2,32 +2,40 @@
 
 use App\Http\Controllers\DataExplorerController;
 use App\Http\Controllers\DeveloperDocsController;
+use App\Http\Controllers\GateController;
 use App\Http\Controllers\SsoAuthorizeController;
 use App\Http\Controllers\SsoViewController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('developer.sso');
+// Gatekeeper Routes (Public)
+Route::get('/gate', [GateController::class, 'show'])->name('gate.show');
+Route::post('/gate', [GateController::class, 'verify'])->name('gate.verify');
+Route::match(['get', 'post'], '/gate/lock', [GateController::class, 'lock'])->name('gate.lock');
+
+// Protected Web Routes (Requires Gatekeeper Access Code)
+Route::middleware('gate')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('developer.sso');
+    });
+
+    Route::prefix('sso')->name('sso.')->group(function () {
+        Route::get('/', [SsoViewController::class, 'index'])->name('index');
+        Route::post('/login', [SsoViewController::class, 'login'])->name('login');
+        Route::get('/token', [SsoViewController::class, 'index']);
+
+        // Authorization Code Flow
+        Route::get('/authorize', [SsoAuthorizeController::class, 'show'])->name('authorize');
+        Route::post('/authorize', [SsoAuthorizeController::class, 'approve'])->name('authorize.approve');
+
+        Route::get('/clients', [SsoViewController::class, 'clients'])->name('clients');
+        Route::get('/clients/create', [SsoViewController::class, 'createClient'])->name('createClient');
+        Route::post('/clients', [SsoViewController::class, 'storeClient'])->name('storeClient');
+        Route::get('/clients/{client}/credentials', [SsoViewController::class, 'showCredentials'])->name('credentials');
+        Route::get('/clients/{client}/edit', [SsoViewController::class, 'editClient'])->name('editClient');
+        Route::put('/clients/{client}', [SsoViewController::class, 'updateClient'])->name('updateClient');
+        Route::delete('/clients/{client}', [SsoViewController::class, 'deleteClient'])->name('deleteClient');
+    });
+
+    Route::get('/developer/sso', [DeveloperDocsController::class, 'index'])->name('developer.sso');
+    Route::get('/data', [DataExplorerController::class, 'index'])->name('data.index');
 });
-
-Route::prefix('sso')->name('sso.')->group(function () {
-    Route::get('/', [SsoViewController::class, 'index'])->name('index');
-    Route::post('/login', [SsoViewController::class, 'login'])->name('login');
-    Route::get('/token', [SsoViewController::class, 'index']);
-
-    // Authorization Code Flow
-    Route::get('/authorize', [SsoAuthorizeController::class, 'show'])->name('authorize');
-    Route::post('/authorize', [SsoAuthorizeController::class, 'approve'])->name('authorize.approve');
-
-    Route::get('/clients', [SsoViewController::class, 'clients'])->name('clients');
-    Route::get('/clients/create', [SsoViewController::class, 'createClient'])->name('createClient');
-    Route::post('/clients', [SsoViewController::class, 'storeClient'])->name('storeClient');
-    Route::get('/clients/{client}/credentials', [SsoViewController::class, 'showCredentials'])->name('credentials');
-    Route::get('/clients/{client}/edit', [SsoViewController::class, 'editClient'])->name('editClient');
-    Route::put('/clients/{client}', [SsoViewController::class, 'updateClient'])->name('updateClient');
-    Route::delete('/clients/{client}', [SsoViewController::class, 'deleteClient'])->name('deleteClient');
-});
-
-Route::get('/developer/sso', [DeveloperDocsController::class, 'index'])->name('developer.sso');
-
-Route::get('/data', [DataExplorerController::class, 'index'])->name('data.index');

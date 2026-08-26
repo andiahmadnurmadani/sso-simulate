@@ -26,6 +26,18 @@
                 <a href="{{ route('sso.index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 {{ in_array($route, $testerRoutes) ? 'bg-indigo-50 text-indigo-700' : '' }}">Tester</a>
                 <a href="{{ route('data.index') }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 {{ $route === 'data.index' ? 'bg-indigo-50 text-indigo-700' : '' }}">Data</a>
                 <a href="{{ url('/api/documentation') }}" target="_blank" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">Swagger</a>
+
+                @if (session('gate_authenticated'))
+                    <form method="POST" action="{{ route('gate.lock') }}" class="inline ml-2">
+                        @csrf
+                        <button type="submit" title="Kunci Akses" class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100/80 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                            <span>Lock</span>
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </nav>
